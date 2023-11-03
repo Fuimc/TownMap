@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <link rel=stylesheet href=leaflet.css />
+    <script src=leaflet.js></script>
+    <script src="leaflet-view-meta.js"></script>
+    <link rel="stylesheet" href="leaflet-view-meta.css"></script>
+
+    
+    <style>
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0
+        }
+        .leaflet-bottom {
+    	display: none;
+	}
+    </style>
+</head>
+
+<body>
+    <div id=map></div>
+    <!--
+    <style type="text/css">
+        img[src$=".gif"], img[src$=".png"] {
+            image-rendering: -moz-crisp-edges;         /* Firefox */
+            image-rendering:   -o-crisp-edges;         /* Opera */
+            image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+            image-rendering: crisp-edges;
+            -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+         }
+    </style>
+-->
+    <style type="text/css">
+        img[src$=".gif"],
+        img[src$=".webp"],
+        img[src$=".png"] {
+            image-rendering: auto;
+            image-rendering: optimizeSpeed;
+            image-rendering: -moz-pixelated;
+            image-rendering: -o-pixelated;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: -webkit-pixelated;
+            image-rendering: pixelated;
+            -ms-interpolation-mode: nearest-neighbor;
+            /* IE (non-standard property) */
+        }
+        .leaflet-tooltip-right::before {
+        display: none;
+        }
+
+    .leaflet-tooltip {
+    padding: 0;
+    background-color: transparent;
+    border: transparent;
+    color: #222;
+    box-shadow: unset;
+    text-align: center;
+}
+    </style>
+<script>
+    var bounds = [[0,0], [512, 512]]
+	function getChunkCorners(chunkCoordinate) {
+	  const chunkSize = 16;
+	  const [chunkZ, chunkX] = chunkCoordinate;
+	  const x1 = chunkX * chunkSize;
+	  const y1 = chunkZ * chunkSize;
+	  const x2 = x1 + chunkSize;
+	  const y2 = y1;
+	  const x3 = x1;
+	  const y3 = y1 + chunkSize;
+	  const x4 = x2;
+	  const y4 = y3;
+      return [
+          [(x1*-1)/32, y1/32],
+          [(x3*-1)/32, y3/32], 
+          [(x4*-1)/32, y4/32], 
+          [(x2*-1)/32, y2/32]];
+	}
+	function stringToColour(str) {
+	  let hash = 0;
+	  str.split('').forEach(char => {
+	    hash = char.charCodeAt(0) + ((hash << 5) - hash);
+	  });
+	  let colour = '#';
+	  for (let i = 0; i < 3; i++) {
+	    const value = (hash >> (i * 8)) & 0xff;
+	    colour += value.toString(16).padStart(2, '0');
+	  }
+	  return colour;
+	}
+
+       var leafletPluginAttribution ='<a href="https://github.com/rwev/leaflet-view-meta">view-meta</a>';
+
+	var day   = L.tileLayer("day/{z}/{x},{y}.png", {
+            maxNativeZoom: 5,
+            minNativeZoom: 0,
+            tileSize: 512,
+        }),
+	    night  = L.tileLayer("night/{z}/{x},{y}.png", {
+            maxNativeZoom: 5,
+            minNativeZoom: 0,
+            tileSize: 512,
+        }),
+	    chunk  = L.tileLayer("chunk_overlay/{z}.png", {
+            maxNativeZoom: 5,
+            minNativeZoom: 0,
+            tileSize: 512,
+        });
+        biome  = L.tileLayer("biome/{z}/{x},{y}.png", {
+            maxNativeZoom: 5,
+            minNativeZoom: 0,
+            tileSize: 512,
+            opacity: 0.9,
+        });
+	var map = L.map("map", {
+            crs: L.CRS.Simple,
+            maxZoom: 10,
+            minZoom: 0,
+            zoom: 1,
+            zoomSnap: 1,
+            center: [0, 0],
+            layers: [day],
+            fadeAnimation: false
+        });
+	var chunkCoordinate = [-375, -313];
+	var chunkCoordinate2 = [-376, -313];
+	var corners = getChunkCorners(chunkCoordinate);
+	var corners2 = getChunkCorners(chunkCoordinate2);
+    /*var chunk_info = L.polygon([corners, corners2], 
+        	{color: '#3388ff',
+        	stroke: false, 
+            fillOpacity: 0.5,
+        }).bindTooltip("My polygon",{permanent: true, direction:"center"})
+;*/
+	var baseLayers = {
+		"Day": day,
+		"Night": night,
+	};
+	var overlayMaps = {
+	    "Chunks": chunk,
+        "Biomes": biome,
+	    /*"Chunk Info": L.layerGroup([chunk_info])*/
+	};
+    
+
+	L.control.layers(baseLayers, overlayMaps).addTo(map);
+	L.control.viewMeta({}).addTo(map);
+</script>
+<!-- infinite negative zoom, but default doesnt work
+    <script>
+        var map = L.map("map", {
+            crs: L.CRS.Simple,
+            maxZoom: 10,
+            minZoom: 2,
+            zoom: 2,
+            zoomSnap: 1,
+            center: [0, 0],
+        }).setView([0, 0], 0);
+        L.tileLayer("tilesw/{x},{y}.webp", {
+            maxNativeZoom: 2,
+            minNativeZoom: 2,
+            tileSize: 512,
+        }).addTo(map);
+    </script>
+    -->
+</body>
+
+</html>
