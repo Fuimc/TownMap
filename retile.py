@@ -25,7 +25,7 @@ def create_larger_tile(x, y, input_directory, tile_size):
     
     # If all parts are transparent, don't return the new tile
     if not all_transparent:
-        return new_tile
+        return new_tile.resize((512, 512), Image.BICUBIC)
     else:
         return None
 

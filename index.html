@@ -126,28 +126,43 @@
             maxZoom: 10,
             minZoom: 0,
             zoom: 1,
-            zoomSnap: 1,
+            zoomSnap: 0.1,
             center: [0, 0],
             layers: [day],
             fadeAnimation: false
         });
+	var day_2023_11_03  = L.tileLayer("updates/2023_11_03/day/{z}/{x},{y}.png", {
+            maxNativeZoom: 5,
+            minNativeZoom: 0,
+            tileSize: 512,
+        }).addTo(map);;
+	var night_2023_11_03  = L.tileLayer("updates/2023_11_03/night/{z}/{x},{y}.png", {
+            maxNativeZoom: 5,
+            minNativeZoom: 5,
+            tileSize: 512,
+        });
+        
 	var chunkCoordinate = [-375, -313];
 	var chunkCoordinate2 = [-376, -313];
 	var corners = getChunkCorners(chunkCoordinate);
 	var corners2 = getChunkCorners(chunkCoordinate2);
-    /*var chunk_info = L.polygon([corners, corners2], 
+    var chunk_info = L.polygon([corners, corners2], 
         	{color: '#3388ff',
         	stroke: false, 
             fillOpacity: 0.5,
-        }).bindTooltip("My polygon",{permanent: true, direction:"center"})
-;*/
+        }).bindTooltip("Spawn",{permanent: true, direction:"center"})
+;
 	var baseLayers = {
 		"Day": day,
 		"Night": night,
 	};
 	var overlayMaps = {
+	    "Updates": day_2023_11_03,
 	    "Chunks": chunk,
-        "Biomes": biome,
+            "Biomes": biome,
+            //"Plot Info": chunk_info,
+            
+
 	    /*"Chunk Info": L.layerGroup([chunk_info])*/
 	};
     
